@@ -6,6 +6,6 @@ margin: 0;
 padding: 0;
 background: teal;
 box-sizing: border-box;
-}`
+}`;
 
 export default GlobalStyle;
