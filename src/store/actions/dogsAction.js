@@ -1,5 +1,5 @@
 import ax from '../../settings/axios-dog';
-import { FETCH_DOGS_SUCCESS, FETCH_DOGS_FAILURE } from '../actionTypes';
+import { FETCH_DOGS_SUCCESS, FETCH_DOGS_FAILURE, FETCH_IMAGE_SUCCESS, FETCH_IMAGE_FAILURE } from '../actionTypes';
 
 const fetchDogsSuccess = (dogs) => {
 	return { type: FETCH_DOGS_SUCCESS, payload: dogs };
@@ -9,40 +9,46 @@ const fetchDogsFailure = (error) => {
 };
 export const fetchDogs = () => {
 	return async (dispatch) => {
-		// const arr = [];
 		try {
 			const response = await ax.get('/all');
-			console.log(response);
+
 			const breeds = [];
-			Object.keys(response.data.message)
-				.forEach((elem) => {
-					console.log(elem);
-				})
-				// let response = res.data;
-				// Object.keys(response.data.message).map((elem) => {
-				// 	// elem.response.data.message[elem];
-				// 	let dog = { main: elem };
-				// 	// dog.poroda = 'sobaka';
-				// 	console.log(dog);
-				// 	return dog;
-				// });
-				.console.log(breeds);
-			// dispatch(fetchDogsSuccess(response));
+
+			Object.keys(response.data.message).forEach((breed) => {
+				if (response.data.message[breed].length) {
+					response.data.message[breed].forEach((type) => {
+						breeds.push({ breed, type });
+					});
+				} else breeds.push({ breed });
+			});
+
+			dispatch(fetchDogsSuccess(breeds));
 		} catch (error) {
 			dispatch(fetchDogsFailure(error));
 		}
 	};
 };
 
-// https://dog.ceo/api/breed/maltese/images/random/3
-// https://dog.ceo/api/breed/mastiff/bull/images/random/3
-// export const fetchCurrProduct = (id) => {
-// 	return async (dispatch) => {
-// 		try {
-// 			const response = await ax.get(`/products/${id}`);
-// 			dispatch(fetchProduct(response.data));
-// 		} catch (e) {
-// 			dispatch(fetchProductsFailure(e));
-// 		}
-// 	};
-// };
+const fetchImageSuccess = () => {
+	return { type: FETCH_IMAGE_SUCCESS };
+};
+const fetchImageFailure = (error) => {
+	return { type: FETCH_IMAGE_FAILURE, payload: error };
+};
+export const fetchImage = (dog) => {
+	return async (dispatch) => {
+		let response = null;
+		try {
+			if (dog.type) {
+				response = await ax.get(`https://dog.ceo/api/breed/${dog.breed}/${dog.type}/images/random/3`);
+				dispatch(fetchImageSuccess());
+			} else {
+				response = await ax.get(`https://dog.ceo/api/breed/${dog.breed}/images/random/3`);
+				dispatch(fetchImageSuccess());
+			}
+			return response.data.message;
+		} catch (error) {
+			dispatch(fetchImageFailure(error));
+		}
+	};
+};

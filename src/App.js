@@ -1,11 +1,11 @@
 import GlobalStyle from './global.style';
-import Main from './pages/Main';
+import Breeds from './pages/Breeds';
 
 function App() {
 	return (
 		<>
 			<GlobalStyle />
-			<Main />
+			<Breeds />
 		</>
 	);
 }
